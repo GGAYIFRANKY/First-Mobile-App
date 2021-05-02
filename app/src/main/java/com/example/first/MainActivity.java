@@ -41,13 +41,38 @@ public class MainActivity extends Activity {
 
                 }else{
 
-                    LoginRequest loginRequest = new LoginRequest();
+                    String username = edUsername.getText().toString();
+                    String password = edPassword.getText().toString();
 
-                    loginRequest.setUsername(edUsername.getText().toString());
-                    loginRequest.setPassword(edPassword.getText().toString());
+                    Call<LoginResponse> call = ApiClient
+                            .getInstance()
+                            .getApi()
+                            .login(username,password);
+
+                    call.enqueue(new Callback<LoginResponse>() {
+                        @Override
+                        public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                            LoginResponse loginResponse = response.body();
 
 
-                    loginUser(loginRequest);
+                            startActivity(new Intent(MainActivity.this, Home.class).putExtra("data", loginResponse));
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(Call<LoginResponse> call, Throwable t) {
+                            String message = "An error occured. Please try again later...";
+                            Toast.makeText(MainActivity.this,message,Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+//                    LoginRequest loginRequest = new LoginRequest();
+//
+//                    loginRequest.setUsername(edUsername.getText().toString());
+//                    loginRequest.setPassword(edPassword.getText().toString());
+//
+//
+//                    loginUser(loginRequest);
                 }
             }
         });
@@ -58,33 +83,33 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-    public void loginUser(LoginRequest loginRequest){
-
-        Call<LoginResponse> loginResponseCall = ApiClient.getService().login(loginRequest);
-
-        loginResponseCall.enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-
-                if(response.isSuccessful()){
-                    LoginResponse loginResponse = response.body();
-                    startActivity(new Intent(MainActivity.this, Home.class).putExtra("data", loginResponse));
-                    finish();
-
-                }else{
-
-                    String message = "An error occured. Please try again later...";
-                    Toast.makeText(MainActivity.this,message,Toast.LENGTH_LONG).show();
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-
-                String message = t.getLocalizedMessage();
-                Toast.makeText(MainActivity.this,message,Toast.LENGTH_LONG).show();
-            }
-        });
-    }
+//    public void loginUser(LoginRequest loginRequest){
+//
+//        Call<LoginResponse> loginResponseCall = ApiClient.getService().login(loginRequest);
+//
+//        loginResponseCall.enqueue(new Callback<LoginResponse>() {
+//            @Override
+//            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+//
+//                if(response.isSuccessful()){
+//                    LoginResponse loginResponse = response.body();
+//                    startActivity(new Intent(MainActivity.this, Home.class).putExtra("data", loginResponse));
+//                    finish();
+//
+//                }else{
+//
+//                    String message = "An error occured. Please try again later...";
+//                    Toast.makeText(MainActivity.this,message,Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<LoginResponse> call, Throwable t) {
+//
+//                String message = t.getLocalizedMessage();
+//                Toast.makeText(MainActivity.this,message,Toast.LENGTH_LONG).show();
+//            }
+//        });
+//    }
 }

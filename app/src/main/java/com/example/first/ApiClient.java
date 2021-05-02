@@ -6,27 +6,26 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    public static Retrofit getRetrofit(){
+    private static final String BASE_URL = "http://165.22.184.254/nikel_test/api/v1/";
+    private static ApiClient mInstance;
+    private Retrofit retrofit;
 
-        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).build();
-
-
-        Retrofit retrofit = new Retrofit.Builder()
+    private ApiClient(){
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("http://165.22.184.254/nikel_test/api/v1/")
-                .client(okHttpClient)
                 .build();
 
-        return retrofit;
     }
 
-    public static UserService getService(){
+    public static synchronized  ApiClient getInstance(){
+        if(mInstance == null){
+            mInstance = new ApiClient();
+        }
+        return  mInstance;
+    }
 
-        UserService userService = getRetrofit().create(UserService.class);
-
-        return userService;
+    public UserService getApi(){
+        return  retrofit.create(UserService.class);
     }
 }
