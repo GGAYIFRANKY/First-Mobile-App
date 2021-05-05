@@ -1,4 +1,4 @@
-package com.example.first;
+package com.example.first.activities;
 
 import android.app.Activity;
 
@@ -6,23 +6,30 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.first.R;
+import com.example.first.api.ApiClient;
+import com.example.first.models.LoginResponse;
+import com.example.first.storage.SharedPrefManager;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends Activity {
-    Button btnLogin;
-    EditText edUsername, edPassword;
-    TextView noAccount;
+public class MainActivity extends Activity implements  View.OnClickListener{
+    private Button btnLogin;
+    private EditText edUsername, edPassword;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -30,13 +37,26 @@ public class MainActivity extends Activity {
         edUsername = findViewById(R.id.username_lg);
         edPassword = findViewById(R.id.password_lg);
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        findViewById(R.id.login_btn).setOnClickListener(this);
+        findViewById(R.id.reg_btn).setOnClickListener(this);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(SharedPrefManager.getInstance(this).isLoggedIn()){
+            Intent intent  = new Intent(this,Home.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+    }
+
+    public void userLogin() {
                 if(TextUtils.isEmpty(edUsername.getText().toString()) || TextUtils.isEmpty(edPassword.getText().toString())){
 
-                    String message = "All inputs are required for registration...";
+                    String message = "All inputs are required for login...";
                     Toast.makeText(MainActivity.this,message,Toast.LENGTH_LONG).show();
 
                 }else{
@@ -52,11 +72,23 @@ public class MainActivity extends Activity {
                     call.enqueue(new Callback<LoginResponse>() {
                         @Override
                         public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+
                             LoginResponse loginResponse = response.body();
 
+                            if(!loginResponse.isError()){
 
-                            startActivity(new Intent(MainActivity.this, Home.class).putExtra("data", loginResponse));
-                            finish();
+                                //Toast.makeText(MainActivity.this,loginResponse.getMessage(),Toast.LENGTH_LONG);
+
+                                SharedPrefManager.getInstance(MainActivity.this).saveUser(loginResponse.getUser());
+                                Intent intent  = new Intent(MainActivity.this,Home.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+
+                            }else{
+
+                                Toast.makeText(MainActivity.this,loginResponse.getMessage(),Toast.LENGTH_LONG);
+                            }
+
                         }
 
                         @Override
@@ -65,22 +97,25 @@ public class MainActivity extends Activity {
                             Toast.makeText(MainActivity.this,message,Toast.LENGTH_LONG).show();
                         }
                     });
-
-//                    LoginRequest loginRequest = new LoginRequest();
-//
-//                    loginRequest.setUsername(edUsername.getText().toString());
-//                    loginRequest.setPassword(edPassword.getText().toString());
-//
-//
-//                    loginUser(loginRequest);
                 }
-            }
-        });
     }
 
-    public void onRegister(View view) {
+    public void onRegister() {
+
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.login_btn:
+                userLogin();
+                break;
+            case R.id.reg_btn:
+                onRegister();
+                break;
+        }
     }
 
 //    public void loginUser(LoginRequest loginRequest){

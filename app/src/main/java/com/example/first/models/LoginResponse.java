@@ -1,21 +1,21 @@
-package com.example.first;
+package com.example.first.models;
 
 
 import java.io.Serializable;
 
-public class LoginResponse implements Serializable {
+public class LoginResponse  {
 
-    private Boolean error;
+    private boolean error;
     private String message;
     private User user;
 
-    public LoginResponse(Boolean error, String message, User user) {
+    public LoginResponse(boolean error, String message, User user) {
         this.error = error;
         this.message = message;
         this.user = user;
     }
 
-    public Boolean getError() {
+    public boolean isError() {
         return error;
     }
 
