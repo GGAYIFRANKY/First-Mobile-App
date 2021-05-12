@@ -31,7 +31,7 @@ public class Home extends AppCompatActivity implements BottomNavigationView.OnNa
         BottomNavigationView navigationView = findViewById(R.id.bottom_navigation);
         navigationView.setOnNavigationItemSelectedListener(this);
 
-
+        displayFragment(new HomeFragment());
 
 //        username = findViewById(R.id.en_username);
 //        User user = SharedPrefManager.getInstance(this).getUser();

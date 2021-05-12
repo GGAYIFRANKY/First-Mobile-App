@@ -2,11 +2,13 @@ package com.example.first.api;
 
 
 import com.example.first.models.LoginResponse;
+import com.example.first.models.UsersResponse;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface UserService {
@@ -27,4 +29,8 @@ public interface UserService {
             @Field("password_2") String password_2
 
     );
+
+
+    @GET("get_users.php")
+    Call<UsersResponse> getUsers();
 }
