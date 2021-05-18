@@ -86,7 +86,7 @@ public class MainActivity extends Activity implements  View.OnClickListener{
 
                             }else{
 
-                                Toast.makeText(MainActivity.this,loginResponse.getMessage(),Toast.LENGTH_LONG);
+                                Toast.makeText(MainActivity.this,loginResponse.getMessage(),Toast.LENGTH_LONG).show();
                             }
 
                         }

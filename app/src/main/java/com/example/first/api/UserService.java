@@ -1,12 +1,14 @@
 package com.example.first.api;
 
 
+import com.example.first.models.DeleteResponse;
 import com.example.first.models.LoginResponse;
 import com.example.first.models.UpdateResponse;
 import com.example.first.models.UsersResponse;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -45,6 +47,23 @@ public interface UserService {
           @Field("email") String email,
           @Field("phone_number") String phone_number
     );
+
+    @FormUrlEncoded
+    @POST("change_password.php")
+    Call<UpdateResponse> updatePassword(
+          @Field("user_id") int user_id,
+          @Field("old_pass") String old_pass,
+          @Field("new_pass") String new_pass
+    );
+
+    @FormUrlEncoded
+    @GET("delete_user.php?user_id={user_id}")
+    Call<DeleteResponse> deleteUser(
+            @Path("user_id") int user_id
+    );
+    
+//    @DELETE("delete_user.php")
+//    Call<DeleteResponse> deleteUser(@Path("id") int id);
 
 //    @FormUrlEncoded
 //    @PUT("edit_user.php/{id}")

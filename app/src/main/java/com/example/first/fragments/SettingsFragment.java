@@ -1,5 +1,8 @@
 package com.example.first.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +15,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.first.R;
+import com.example.first.activities.Home;
+import com.example.first.activities.MainActivity;
+import com.example.first.activities.RegisterActivity;
 import com.example.first.api.ApiClient;
+import com.example.first.models.DeleteResponse;
 import com.example.first.models.UpdateResponse;
 import com.example.first.models.User;
 import com.example.first.storage.SharedPrefManager;
@@ -41,8 +48,8 @@ public class SettingsFragment extends Fragment  implements  View.OnClickListener
         editTextName = view.findViewById(R.id.editTextUser);
         editTextEmail = view.findViewById(R.id.editTextEmail);
         editTextPhone = view.findViewById(R.id.editTextPhone);
-        editTextCurrentPassword = view.findViewById(R.id.current_password);
-        editTextOldPassword = view.findViewById(R.id.new_password);
+        editTextOldPassword = view.findViewById(R.id.current_password);
+        editTextCurrentPassword = view.findViewById(R.id.new_password);
 
         view.findViewById(R.id.updateUser).setOnClickListener(this);
         view.findViewById(R.id.changePassword).setOnClickListener(this);
@@ -89,22 +96,119 @@ public class SettingsFragment extends Fragment  implements  View.OnClickListener
 
 
         call.enqueue(new Callback<UpdateResponse>() {
+
             @Override
             public void onResponse(Call<UpdateResponse> call, Response<UpdateResponse> response) {
 
-                Toast.makeText(getActivity(),response.body().getMessage(),Toast.LENGTH_LONG).show();
-
                 if(!response.body().isError()){
+                    Toast.makeText(getActivity(),response.body().getMessage(),Toast.LENGTH_LONG).show();
                     SharedPrefManager.getInstance(getActivity()).saveUser(response.body().getUser());
+                }else{
+                    Toast.makeText(getActivity(),response.body().getMessage(),Toast.LENGTH_LONG).show();
                 }
+
             }
 
             @Override
             public void onFailure(Call<UpdateResponse> call, Throwable t) {
 
-                Toast.makeText(getActivity(),"An Error occured",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(),"An Error occured. Try again",Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void updatePassword(){
+
+        String old_pass = editTextOldPassword.getText().toString();
+        String new_pass = editTextCurrentPassword.getText().toString();
+
+        User user = SharedPrefManager.getInstance(getActivity()).getUser();
+        int user_id = user.getId();
+
+        if(old_pass.isEmpty() | new_pass.isEmpty()){
+            editTextName.setError("Input both fields");
+            editTextName.requestFocus();
+            return;
+        }
+
+        Call<UpdateResponse> call = ApiClient.getInstance().getApi().updatePassword(
+                user_id,
+                old_pass,
+                new_pass
+        );
+
+        call.enqueue(new Callback<UpdateResponse>() {
+
+            @Override
+            public void onResponse(Call<UpdateResponse> call, Response<UpdateResponse> response) {
+
+                Toast.makeText(getActivity(),response.body().getMessage(),Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<UpdateResponse> call, Throwable t) {
+                Toast.makeText(getActivity(),"An Error occured. Try again",Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void logoutUser(){
+
+        SharedPrefManager.getInstance(getActivity()).clear();
+        Intent intent  = new Intent(getActivity(),MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    private void deleteUser(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Are you sure?");
+        builder.setMessage("This action is irreversible");
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                User user = SharedPrefManager.getInstance(getActivity()).getUser();
+
+                int user_id = user.getId();
+ 
+                Call<DeleteResponse> call = ApiClient.getInstance().getApi().deleteUser(user_id);
+
+                call.enqueue(new Callback<DeleteResponse>() {
+                    @Override
+                    public void onResponse(Call<DeleteResponse> call, Response<DeleteResponse> response) {
+
+                        if(!response.body().isError()){
+
+                            SharedPrefManager.getInstance(getActivity()).clear();
+                            Intent intent  = new Intent(getActivity(), RegisterActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        }
+
+                        Toast.makeText(getActivity(),response.body().getMessage(),Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onFailure(Call<DeleteResponse> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog ad = builder.create();
+        ad.show();
     }
 
     @Override
@@ -114,10 +218,13 @@ public class SettingsFragment extends Fragment  implements  View.OnClickListener
                 updateProfile();
                 break;
             case R.id.changePassword:
+                updatePassword();
                 break;
             case R.id.logout:
+                logoutUser();
                 break;
             case R.id.delete_profile:
+                deleteUser();
                 break;
 
         }

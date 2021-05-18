@@ -27,7 +27,7 @@
             android:drawableLeft="@drawable/user"
             android:drawablePadding="10dp"
             android:hint="Username"
-            android:inputType="textEmailAddress"
+            android:inputType="text"
             />
 
         <EditText
@@ -49,7 +49,7 @@
             android:drawableLeft="@drawable/phone"
             android:drawablePadding="10dp"
             android:hint="Phone number"
-            android:inputType="textEmailAddress"
+            android:inputType="text"
             />
 
         <Button
@@ -59,7 +59,7 @@
             android:layout_marginTop="10dp"
             android:layout_centerInParent="true"
             android:onClick="onClick"
-            android:background="#00FF00"
+            android:background="#008000"
             android:text="Update User" />
 
         <View
@@ -85,7 +85,7 @@
             android:drawableLeft="@drawable/password"
             android:drawablePadding="10dp"
             android:hint="Current Password"
-            android:inputType="textEmailAddress"
+            android:inputType="textPassword"
             />
 
         <EditText
@@ -96,7 +96,7 @@
             android:drawableLeft="@drawable/password"
             android:drawablePadding="15dp"
             android:hint="New Password"
-            android:inputType="textEmailAddress"
+            android:inputType="textPassword"
             />
 
         <Button
@@ -106,7 +106,7 @@
             android:layout_marginTop="10dp"
             android:layout_centerInParent="true"
             android:onClick="onClick"
-            android:background="#00FF00"
+            android:background="#008000"
             android:text="Change Password" />
 
         <View
@@ -123,7 +123,7 @@
             android:layout_marginTop="40dp"
             android:layout_centerInParent="true"
             android:onClick="onClick"
-            android:background="#00FF00"
+            android:background="#008000"
             android:text="Logout" />
 
         <Button
@@ -133,7 +133,7 @@
             android:layout_marginTop="20dp"
             android:layout_centerInParent="true"
             android:onClick="onClick"
-            android:background="#FF0000"
+            android:background="#ff0000"
             android:text="Delete Profile" />
 
     </LinearLayout>
